@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+  <!-- prettier-ignore -->
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+    <link rel="shortcut icon" href="https://cdn.glitch.com/e1c8387f-9c1d-4683-84b5-32c40c510abd%2Ffavicon.ico?v=1579979902340" type="image/x-icon" />
+
+    <!-- Bootstrap -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous" />
+    <!-- highlight.js -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@9.18.0/build/styles/default.min.css" />
+
+    <title>Python metric-imperial converter microservice – Ty Mick</title>
+  </head>
+
+  <body style="background-color: #dee2e6;">
+    <div class="container-md my-5">
+      <h1 class="mb-4">Python metric-imperial converter microservice</h1>
+
+      <!-- API test front end -->
+      <div class="card mb-4">
+        <div class="card-body">
+          <h5 class="mb-3">Test this API:</h5>
+
+          <form id="apiTest" class="mb-4">
+            <div class="form-group">
+              <label class="sr-only" for="apiInput">API input</label>
+              <div class="input-group">
+                <div class="input-group-prepend">
+                  <div class="input-group-text">/api/convert?input=</div>
+                </div>
+                <input
+                  type="text"
+                  id="apiInput"
+                  name="input"
+                  class="form-control"
+                  aria-describedby="inputHelp"
+                  style="max-width: 10em;"
+                />
+              </div>
+              <small id="inputHelp" class="form-text text-muted">
+                Unit must be one of <samp>gal</samp>, <samp>L</samp>,
+                <samp>lbs</samp>, <samp>kg</samp>, <samp>mi</samp>, or
+                <samp>km</samp> to get a meaningful result.
+              </small>
+            </div>
+
+            <button type="submit" class="btn btn-primary">GET</button>
+          </form>
+
+          <h5>API output:</h5>
+
+          <div class="card">
+            <pre id="apiOutput" class="hljs bg-white mb-0">&#8203;</pre>
+          </div>
+        </div>
+      </div>
+
+      <!-- Explanation -->
+      <p class="lead font-italic">
+        View the source on
+        <a href="https://github.com/tywmick/metricimpconverter-python"
+          >GitHub</a
+        >
+        or
+        <a href="https://glitch.com/edit/#!/ty-metricimpconverter-python"
+          >Glitch</a
+        >.
+      </p>
+
+      <p>
+        This is a Python/<a href="https://flask.palletsprojects.com/en/1.1.x/"
+          >Flask</a
+        >
+        port of the API portion of my
+        <a href="https://ty-file-metadata.glitch.me"
+          >Node.js metric-imperial converter microservice project</a
+        >. It fulfills the following user stories:
+      </p>
+
+      <ol>
+        <li>
+          I can <b>GET</b> <code>/api/convert</code> with a single parameter
+          containing an accepted number and unit and have it converted.
+        </li>
+
+        <li>
+          Hint: Split the input by looking for the index of the first character.
+        </li>
+
+        <li>
+          I can convert 'gal' to 'L' and vice versa. <b>(1 gal to 3.78541 L)</b>
+        </li>
+
+        <li>
+          I can convert 'lbs' to 'kg' and vice versa.
+          <b>(1 lbs to 0.453592 kg)</b>
+        </li>
+
+        <li>
+          I can convert 'mi' to 'km' and vice versa. <b>(1 mi to 1.60934 km)</b>
+        </li>
+
+        <li>
+          If my unit of measurement is invalid, returned will be 'invalid unit'.
+        </li>
+
+        <li>If my number is invalid, returned with will 'invalid number'.</li>
+
+        <li>If both are invalid, return will be 'invalid number and unit'.</li>
+
+        <li>
+          I can use fractions, decimals or both in my parameter (e.g., 5, 1/2,
+          2.5/6), but if nothing is provided it will default to 1.
+        </li>
+
+        <li>
+          My return will consist of the <code>initNum</code>,
+          <code>initUnit</code>, <code>returnNum</code>,
+          <code>returnUnit</code>, and <code>string</code> spelling out units in
+          format
+          <samp
+            >{initNum} {initial_Units} converts to {returnNum}
+            {return_Units}</samp
+          >
+          with the result rounded to 5 decimals.
+        </li>
+      </ol>
+    </div>
+
+    <!-- Glitch button -->
+    <div
+      class="glitchButton"
+      style="position:absolute;top:20px;right:20px;"
+    ></div>
+    <script src="https://button.glitch.me/button.js"></script>
+
+    <!-- prettier-ignore -->
+    <span>
+      <!-- jQuery -->
+      <script src="https://code.jquery.com/jquery-3.4.1.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>
+      <!-- Bootstrap -->
+      <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js" integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6" crossorigin="anonymous"></script>      
+      <!-- highlight.js -->
+      <script src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@9.18.0/build/highlight.min.js"></script>
+    </span>
+
+    <script>
+      $(function() {
+        $("#apiTest").submit(function() {
+          $("button").attr("disabled", true);
+          $("button", this).html(
+            '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span><span class="sr-only">Uploading...</span>'
+          );
+          event.preventDefault();
+          $.ajax({
+            url: "/api/convert",
+            type: "get",
+            data: $(this).serialize(),
+            success: function(result) {
+              $("#apiOutput").text(JSON.stringify(result, null, 2));
+              hljs.highlightBlock(document.getElementById("apiOutput"));
+              $("#apiTest button").html("GET");
+              $("button").removeAttr("disabled");
+            }
+          });
+        });
+      });
+    </script>
+  </body>
+</html>

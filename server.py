@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from datetime import datetime, timezone
 from flask import Flask, request, render_template, jsonify
 import convert
 
